@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"/>
+<title>WoodHaven Project Acceptance Form</title>
+<style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background:#f2f4f7; color:#111; }
+    body { font: 400 14px/1.5 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+
+    .container { max-width: 100vw; margin: 0; padding: 12px; background:#fff; min-height: 100vh; }
+
+    /* Header: logo | title | buttons on one line */
+    .header {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e7eb;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .logo-box { margin: 0; }
+    .logo-box svg { width: 100px; height: 50px; display:block; }
+    .title { font-size: 22px; font-weight: 700; text-align: center; margin: 0; line-height: 1.3; }
+    .meta-buttons { display: flex; gap: 6px; justify-self: end; }
+    /* half-sized buttons */
+    .btn { display: inline-flex; align-items: center; justify-content: center;
+           padding: 5px 10px; border: 1px solid #d0d7de; border-radius: 6px;
+           background: #fff; cursor: pointer; font-size: 12px; font-weight: 500;
+           min-width: 60px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .btn:active { background: #f0f0f0; }
+
+    /* meta row sits under the header line and spans full width */
+    .meta { grid-column: 1 / -1; text-align: right; font-size: 12px; color: #666; margin-top: 8px; }
+
+    .section { margin-bottom: 20px; }
+    .section h2 { font-size: 16px; font-weight: 700; margin: 0 0 12px; color: #111; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .form-row { display: flex; flex-direction: column; }
+    .form-row.full { grid-column: 1 / -1; }
+    label { font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #333; }
+    input[type="text"], textarea { width: 100%; padding: 10px; border: 1px solid #d0d7de; border-radius: 6px; font-size: 14px; background: #fff; }
+    textarea { min-height: 100px; resize: vertical; font-family: inherit; }
+
+    table { width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; font-size: 13px; }
+    th, td { border-bottom: 1px solid #e5e7eb; padding: 10px 8px; text-align: left; vertical-align: middle; }
+    th { background: #f8f9fa; font-weight: 700; font-size: 12px; }
+    tr:last-child td { border-bottom: none; }
+    td.center { text-align: center; }
+    input[type="radio"] { width: 20px; height: 20px; cursor: pointer; }
+
+    .sign-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .sign-box { display: flex; flex-direction: column; }
+    .sign-label { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .sign-canvas { width: 100%; height: 120px; background: #fafafa; border: 2px dashed #d0d7de; border-radius: 8px; cursor: pointer; touch-action: none; }
+    .sign-hint { font-size: 11px; color: #666; margin-top: 4px; text-align: center; }
+
+    .footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #666; border-top: 1px solid #e5e7eb; padding-top: 12px; margin-top: 20px; }
+
+    /* PDF 容器（用于导出） */
+    #pdf-contract-root { font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif; position: fixed; left: -10000px; top: -10000px; }
+    #pdf-contract-root .contract { width: 794px; padding: 48px 56px; border: 1px solid #111; margin: 0 auto; background: #fff; }
+    #pdf-contract-root h1 { text-align: center; font-weight: 700; margin: 0 0 12px; font-size: 22px; letter-spacing: 0.5px; }
+    #pdf-contract-root .meta-line { text-align: right; margin-bottom: 18px; font-size: 12px; }
+    #pdf-contract-root .block-title { font-weight: 700; margin: 18px 0 8px; }
+    #pdf-contract-root table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    #pdf-contract-root th, #pdf-contract-root td { border: 1px solid #111; padding: 8px 10px; vertical-align: top; }
+    #pdf-contract-root th { background: #f6f7f8; text-align: left; width: 24%; }
+    #pdf-contract-root .note-box { min-height: 80px; border: 1px solid #111; padding: 8px 10px; }
+    #pdf-contract-root .sign-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+    #pdf-contract-root .sign-box { border: 1px solid #111; padding: 8px 10px; height: 120px; display:flex; align-items:center; justify-content:center; }
+    #pdf-contract-root .sign-box img { max-width: 100%; max-height: 100%; }
+    #pdf-contract-root .footer { display:flex; justify-content:space-between; font-size: 11px; margin-top: 18px; border-top: 1px solid #111; padding-top: 8px; }
+  
+/* ===== UI Polish (layout/js untouched) ===== */
+:root{
+  --brand:#2c5f2d;
+  --brand-600:#254f25;
+  --ink:#111;
+  --muted:#666;
+  --panel:#ffffff;
+  --bg:#f2f4f7;
+  --accent:#d7eadd;
+  --elev:0 8px 24px rgba(0,0,0,.12);
+  --glow:0 0 0 2px rgba(44,95,45,.15), 0 8px 20px rgba(44,95,45,.25);
+  --bevel-light:inset 0 2px 2px rgba(255,255,255,.6);
+  --bevel-dark:inset 0 -2px 4px rgba(0,0,0,.08);
+}
+html, body { background: var(--bg); color: var(--ink); }
+.container{
+  background: radial-gradient(1200px 700px at 80% -200px, rgba(44,95,45,.05), transparent 60%) , var(--panel);
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.08);
+}
+
+/* Header */
+.header{
+  border-bottom: 2px solid #e5e7eb;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,255,255,.6)),
+    radial-gradient(500px 120px at 0% -40px, rgba(44,95,45,.08), transparent 60%);
+  border-radius: 12px 12px 0 0;
+  backdrop-filter: saturate(1.1);
+}
+.logo-box img{
+  height:50px; display:block;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.12));
+  transition: transform .25s ease, filter .25s ease;
+}
+.logo-box img:hover{
+  transform: translateY(-1px) scale(1.02);
+  filter: drop-shadow(0 4px 14px rgba(44,95,45,.35));
+}
+.title{
+  letter-spacing:.3px;
+  text-shadow: 0 1px 0 #fff;
+}
+
+/* Buttons */
+.btn{
+  border: 1px solid rgba(0,0,0,.08);
+  background: linear-gradient(#fff, #f7f9fb);
+  box-shadow: var(--bevel-light), var(--bevel-dark), 0 1px 2px rgba(0,0,0,.06);
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+}
+.btn:hover{
+  box-shadow: var(--glow);
+}
+.btn:active{
+  transform: translateY(1px);
+  background: linear-gradient(#f1f5f3, #fdfdfd);
+}
+
+/* Section titles (embossed divider) */
+.section h2{
+  background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(240,244,240,.85));
+  border: 1px solid rgba(44,95,45,.12);
+  color:#0f172a;
+  padding:10px 12px;
+  border-radius:10px;
+  box-shadow: var(--bevel-light), var(--bevel-dark);
+}
+
+/* Inputs & Textarea (soft bevel + focus glow) */
+input[type="text"], textarea{
+  border: 1px solid #d7dde3;
+  background: linear-gradient(180deg, #fff, #f9fbfc);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.04);
+  transition: box-shadow .2s ease, border-color .2s ease, transform .1s ease;
+}
+input[type="text"]:hover, textarea:hover{
+  box-shadow: 0 1px 0 rgba(255,255,255,.8), 0 4px 18px rgba(44,95,45,.08);
+}
+input[type="text"]:focus, textarea:focus{
+  outline: none;
+  border-color: rgba(44,95,45,.45);
+  box-shadow: var(--glow);
+  background: #fff;
+}
+label{
+  color:#243b2e;
+  text-shadow: 0 1px 0 rgba(255,255,255,.6);
+}
+
+/* Grid cards visual without changing layout */
+.form-grid{
+  padding: 4px;
+}
+.form-row{
+  background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(248,250,251,.95));
+  border: 1px solid rgba(15,23,42,.06);
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06), var(--bevel-light), var(--bevel-dark);
+  transition: box-shadow .2s ease, transform .12s ease;
+}
+.form-row:hover{
+  box-shadow: 0 8px 24px rgba(44,95,45,.12);
+  transform: translateY(-1px);
+}
+
+/* Table styling (row hover glow, subtle zebra) */
+table{
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(15,23,42,.08);
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+}
+th{
+  background: linear-gradient(180deg, #f6faf8, #eef4f1);
+  border-bottom: 1px solid rgba(15,23,42,.08);
+}
+tbody tr:nth-child(odd) td{ background: #fcfdfc; }
+tbody tr:hover td{
+  background: #f2fbf4;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+/* Signature canvas (embossed pad + hover glow) */
+.sign-canvas{
+  background: linear-gradient(180deg, #fafafa, #f3f6f4);
+  border: 2px dashed rgba(44,95,45,.3);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.04), 0 2px 10px rgba(0,0,0,.06);
+  transition: box-shadow .2s ease, border-color .2s ease, transform .12s ease;
+}
+.sign-canvas:hover{
+  border-color: rgba(44,95,45,.6);
+  box-shadow: var(--glow);
+  transform: translateY(-1px);
+}
+
+/* Footer */
+.footer{
+  border-top: 1px solid rgba(15,23,42,.08);
+  color:#475569;
+}
+
+/* Micro-interactions preference */
+@media (prefers-reduced-motion: reduce){
+  *{ transition: none !important; }
+}
+
+
+/* ===== Adjusted for Light Pastel UI ===== */
+html, body { background: linear-gradient(180deg, #f5f7fa, #edf2f0); }
+.container{
+  background: linear-gradient(180deg, #fefefe, #f5f8f7);
+}
+.section h2{
+  background: linear-gradient(180deg, #f9fbf9, #eaf2ee);
+}
+.form-row{
+  background: linear-gradient(180deg, #fefefe, #f6faf7);
+}
+tbody tr:nth-child(odd) td{ background: #f8fbf9; }
+tbody tr:hover td{ background: #eef7f1; }
+.sign-canvas{
+  background: linear-gradient(180deg, #fdfdfd, #f4f8f6);
+}
+
+
+/* ===== Soft Pastel Base (No Pure White) ===== */
+html, body { background: linear-gradient(180deg, #e8ede9, #dfe7e3); }
+.container{
+  background: linear-gradient(180deg, #f3f0ea, #e9e4dc);
+}
+.section h2{
+  background: linear-gradient(180deg, #f0ebe2, #e5dfd3);
+}
+.form-row{
+  background: linear-gradient(180deg, #f2eee6, #e8e2d7);
+}
+tbody tr:nth-child(odd) td{ background: #f3eee5; }
+tbody tr:hover td{ background: #e9e3d9; }
+.sign-canvas{
+  background: linear-gradient(180deg, #f1ece3, #e6dfd3);
+}
+
+
+/* ===== High-End Custom Cabinet "Luxe" UI (UI-only; no layout/PDF changes) ===== */
+:root{
+  --lux-ink:#121416;
+  --lux-ink-soft:#2a2f2b;
+  --lux-bg1:#e6e0d6;     /* warm taupe */
+  --lux-bg2:#dbd4c8;     /* beige */
+  --lux-panel1:#efe9df;  /* panel top */
+  --lux-panel2:#e6dfd2;  /* panel bottom */
+  --lux-emerald:#254f25; /* brand deep green */
+  --lux-gold:#c6a66a;    /* champagne gold accent */
+  --lux-gold-2:#e0cfa2;
+  --lux-shadow:0 8px 28px rgba(18,20,22,.14);
+  --lux-inset:inset 0 1px 2px rgba(255,255,255,.5), inset 0 -1px 2px rgba(0,0,0,.06);
+  --lux-bevel:inset 0 2px 3px rgba(255,255,255,.5), inset 0 -2px 6px rgba(0,0,0,.08);
+  --lux-glow:0 0 0 1px rgba(198,166,106,.45), 0 6px 20px rgba(37,79,37,.25);
+}
+
+/* Ambient background (no white) */
+html, body{
+  background:
+    radial-gradient(1400px 800px at 85% -200px, rgba(37,79,37,.10), transparent 55%),
+    linear-gradient(180deg, var(--lux-bg1), var(--lux-bg2));
+  color: var(--lux-ink);
+}
+
+/* Container as a refined panel with subtle sheen */
+.container{
+  background:
+    linear-gradient(180deg, var(--lux-panel1), var(--lux-panel2));
+  border-radius: 16px;
+  box-shadow: var(--lux-shadow);
+  border: 1px solid rgba(18,20,22,.08);
+  position: relative;
+  overflow: hidden;
+}
+.container:before{
+  content:"";
+  position:absolute; inset:0;
+  background:
+    linear-gradient(120deg, rgba(198,166,106,.12), transparent 25%),
+    radial-gradient(800px 160px at 0% 0%, rgba(37,79,37,.06), transparent 60%);
+  pointer-events:none;
+}
+
+/* Header with luxe hairline */
+.header{
+  border-bottom: 1px solid rgba(18,20,22,.10);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.15), rgba(255,255,255,.05));
+  border-radius: 14px 14px 0 0;
+  box-shadow: var(--lux-inset);
+}
+.title{
+  letter-spacing:.4px;
+  color:#0e1410;
+  text-shadow: 0 1px 0 rgba(255,255,255,.7);
+}
+.logo-box img{
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,.18));
+  transition: transform .25s ease, filter .25s ease;
+}
+.logo-box img:hover{
+  transform: translateY(-1px) scale(1.015);
+  filter: drop-shadow(0 6px 18px rgba(37,79,37,.35));
+}
+
+/* Meta buttons with champagne sheen */
+.btn{
+  background:
+    linear-gradient(180deg, #faf7f1, #efe4d0 48%, #e7dcc7 52%, #f7efe0);
+  border: 1px solid rgba(198,166,106,.55);
+  color: #2b2b2b;
+  box-shadow: var(--lux-bevel), 0 2px 8px rgba(0,0,0,.08);
+  transition: box-shadow .25s ease, transform .12s ease, filter .25s ease;
+}
+.btn:hover{
+  box-shadow: var(--lux-glow);
+  filter: saturate(1.02);
+}
+.btn:active{ transform: translateY(1px); }
+
+/* Section titles: engraved plates */
+.section h2{
+  background:
+    linear-gradient(180deg, #efe7d9, #e6ddcc);
+  border: 1px solid rgba(18,20,22,.12);
+  color:#1a241c;
+  border-radius:12px;
+  padding:10px 12px;
+  box-shadow: var(--lux-bevel);
+  position: relative;
+}
+.section h2:after{
+  content:"";
+  position:absolute; left:10px; right:10px; bottom:6px; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(198,166,106,.45), transparent);
+  pointer-events:none;
+}
+
+/* Inputs & textareas: soft leather-like panels */
+input[type="text"], textarea{
+  background: linear-gradient(180deg, #fbf6ed, #efe6d7);
+  border: 1px solid rgba(18,20,22,.10);
+  border-radius: 10px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.05), 0 1px 0 rgba(255,255,255,.7);
+  transition: box-shadow .25s ease, border-color .2s ease, transform .1s ease;
+}
+input[type="text"]:hover, textarea:hover{
+  box-shadow: 0 0 0 1px rgba(198,166,106,.35), 0 8px 20px rgba(37,79,37,.10);
+}
+input[type="text"]:focus, textarea:focus{
+  outline: none;
+  border-color: rgba(37,79,37,.55);
+  box-shadow: 0 0 0 2px rgba(37,79,37,.25), 0 10px 26px rgba(37,79,37,.15);
+  background: linear-gradient(180deg, #fff5e7, #f3e6d4);
+}
+
+/* Labels with refined tint */
+label{ color:#243629; text-shadow:0 1px 0 rgba(255,255,255,.6); }
+
+/* Form row cards */
+.form-row{
+  background: linear-gradient(180deg, #f0e8da, #e9decb);
+  border: 1px solid rgba(18,20,22,.08);
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06), var(--lux-inset);
+  transition: transform .12s ease, box-shadow .25s ease;
+}
+.form-row:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(37,79,37,.12);
+}
+
+/* Tables: subtle zebra + row hover glow */
+table{
+  border: 1px solid rgba(18,20,22,.10);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.08);
+}
+th{
+  background: linear-gradient(180deg, #eee4d3, #e6d7bf);
+  border-bottom: 1px solid rgba(18,20,22,.10);
+  color:#1c2620;
+}
+tbody tr:nth-child(odd) td{ background:#f3ebde; }
+tbody tr:nth-child(even) td{ background:#efe6d7; }
+tbody tr:hover td{
+  background: #e9dfcd;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+}
+
+/* Signature pad luxe */
+.sign-canvas{
+  background: linear-gradient(180deg, #f0e7d7, #e6dbc9);
+  border: 2px dashed rgba(198,166,106,.55);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.05), 0 2px 12px rgba(0,0,0,.08);
+  transition: box-shadow .25s ease, border-color .2s ease, transform .12s ease;
+}
+.sign-canvas:hover{
+  border-color: rgba(37,79,37,.65);
+  box-shadow: var(--lux-glow);
+  transform: translateY(-1px);
+}
+.sign-hint{ color:#6b705c; }
+
+/* Footer hairline */
+.footer{
+  border-top: 1px solid rgba(18,20,22,.12);
+  color:#3f4a41;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce){
+  *{ transition:none !important; }
+}
+
+
+/* ===== PDF Minimal / No-Fill Look ===== */
+#pdf-contract-root .contract{
+  background:#ffffff; /* printing paper; no tinted fills */
+}
+#pdf-contract-root h1{
+  background: transparent;
+  letter-spacing:.5px;
+}
+#pdf-contract-root .meta-line,
+#pdf-contract-root .block-title{
+  background: transparent;
+}
+#pdf-contract-root table{
+  border-collapse: collapse;
+  background: transparent;
+}
+#pdf-contract-root th, #pdf-contract-root td{
+  background: transparent !important; /* remove any cell fills */
+  border: 0.8pt solid #111;          /* clean thin lines for print */
+  padding: 8px 10px;
+}
+#pdf-contract-root th{
+  font-weight: 700;
+}
+#pdf-contract-root .note-box{
+  background: transparent;
+  border: 0.8pt solid #111;
+}
+#pdf-contract-root .sign-grid{ gap: 16px; }
+#pdf-contract-root .sign-box{
+  border: 0.8pt solid #111;
+  background: transparent;
+}
+#pdf-contract-root .footer{
+  border-top: 0.8pt solid #111;
+}
+
+
+/* ===== Scaling & Title No-Wrap ===== */
+html, body{
+  transform-origin: top left;
+}
+/* Allow zoom scaling via ctrl+wheel or pinch-zoom (no fixed width) */
+meta[name="viewport"]{
+  content: "width=device-width, initial-scale=1, maximum-scale=5";
+}
+.title{
+  white-space: nowrap;
+}
+
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header">
+<div class="logo-box">
+<img src="Image/logo.png" alt="Woodhaven logo" style="height:50px; display:block;" />
+</div>
+<h1 class="title">Project Acceptance Form</h1>
+<div class="meta-buttons">
+<button class="btn" id="btn-download">Download</button>
+</div>
+<div class="meta">
+<div id="pmid-display"></div>
+<div id="today"></div>
+<div style="margin-top: 4px;">31 Chu Yen St, Singapore 669833   Tel: 6264 2926</div>
+</div>
+</header>
+<section class="section">
+<h2>项目信息 Project Info</h2>
+<div class="form-grid">
+<div class="form-row">
+<label>PM/ID</label>
+<input id="pm-id" placeholder="PM-2025-0918" type="text"/>
+</div>
+<div class="form-row">
+<label>Tele</label>
+<input id="phone" placeholder="Tele" type="text"/>
+</div>
+<!-- Changed: client & address now side-by-side like PM/ID & Tele -->
+<div class="form-row">
+<label>Client/Company 客户/公司</label>
+<input id="client" placeholder="Client/Company" type="text"/>
+</div>
+<div class="form-row">
+<label>Project Address 项目地址</label>
+<input id="address" placeholder="Address" type="text"/>
+</div>
+</div>
+</section>
+<section class="section">
+<h2>服务确认 Service Checklist</h2>
+<table>
+<thead>
+<tr><th>项目 Item</th><th>回答 Answer</th></tr>
+</thead>
+<tbody><tr><td>1. How would you rate your overall satisfaction with our service?<br/><small>您对我们本次服务的总体满意度如何？</small></td><td class="center"><input style="width:100%" type="text"/></td></tr><tr><td>2. How likely are you to recommend our products and services to your family and friends?<br/><small>您有多大可能将我们的产品与服务推荐给您的家人和朋友？</small></td><td class="center"><input style="width:100%" type="text"/></td></tr><tr><td>3. How would you rate the professionalism of our design and communication?<br/><small>您对我们方案设计与沟通的“专业性”评价如何？</small></td><td class="center"><input style="width:100%" type="text"/></td></tr><tr><td>4. Did the installer arrive on time?<br/><small>安装师傅是否按时到达？</small></td><td class="center"><input style="width:100%" type="text"/></td></tr><tr><td>5. During the installation, did our technician take care of your property and keep the work area clean?<br/><small>在安装过程中，师傅是否爱护您的现场物品并保持环境整洁？</small></td><td class="center"><input style="width:100%" type="text"/></td></tr><tr><td>6. Are you satisfied with the final result of the installation service?<br/><small>您对本次“安装服务”的最终完成效果是否满意？</small></td><td class="center"><input style="width:100%" type="text"/></td></tr><tr><td>7. Do you feel our products and services are reasonably priced?<br/><small>您认为我们的产品与服务的“价格”合理吗？</small></td><td class="center"><input style="width:100%" type="text"/></td></tr><tr><td>8. Based on your experience, what is the most important area for us to improve?<br/><small>在本次体验中，您认为最需要改进的地方是什么？</small></td><td class="center"><input style="width:100%" type="text"/></td></tr></tbody>
+</table>
+</section>
+<section class="section">
+<h2>备注 Notes</h2>
+<textarea id="notes" placeholder=" Notes"></textarea>
+</section>
+<section class="section">
+<h2>签名 Signatures</h2>
+<div class="sign-wrap">
+<div class="sign-box">
+<div class="sign-label">客户签名 Customer</div>
+<canvas class="sign-canvas" id="sig-customer"></canvas>
+<div class="sign-hint">Click to sign</div>
+</div>
+<div class="sign-box">
+<div class="sign-label">person in charge</div>
+<canvas class="sign-canvas" id="sig-rep"></canvas>
+<div class="sign-hint">Click to sign</div>
+</div>
+</div>
+</section>
+<footer class="footer">
+<div>Woodhaven Craftworks</div>
+<div>木渊</div>
+</footer>
+</div>
+<!-- PDF 合同容器（导出时生成） -->
+<div id="pdf-contract-root"></div>
+
+<!-- PDF 导出：html2canvas + jsPDF -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script>
+// --- Basic meta ---
+const dateStr = "2025-10-04";
+document.getElementById('today').textContent = dateStr;
+const pmInput = document.getElementById('pm-id');
+pmInput.addEventListener('input', () => {
+  document.getElementById('pmid-display').textContent = pmInput.value ? `PM/ID: ${pmInput.value}` : '';
+});
+
+// --- Signature pads ---
+const signatures = { 'sig-customer': null, 'sig-rep': null };
+let currentSignTarget = null;
+
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  return ctx;
+}
+
+['sig-customer','sig-rep'].forEach(id => {
+  const canvas = document.getElementById(id);
+  setupCanvas(canvas);
+  canvas.addEventListener('click', () => openSignPad(id));
+});
+
+let popup, popupCanvas, popupCtx, isDrawing=false, lastPoint=null;
+
+function ensurePopup() {
+  if (popup) return;
+  popup = document.createElement('div');
+  popup.style.cssText = 'position:fixed;inset:0;background:#fff;display:none;flex-direction:column;z-index:9999;';
+  popup.innerHTML = `
+    <div style="padding:16px;border-bottom:1px solid #e5e7eb;background:#f8f9fa">
+      <div style="font-weight:700;font-size:18px" id="popup-title">签名</div>
+      <div style="font-size:13px;color:#666">请在下方白色区域签名</div>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:20px;background:#f8f9fa">
+      <canvas id="popup-canvas" style="width:calc(100% - 40px);max-width:600px;height:250px;background:#fff;border:2px solid #333;border-radius:8px;touch-action:none"></canvas>
+    </div>
+    <div style="padding:16px;display:flex;gap:12px;border-top:1px solid #e5e7eb">
+      <button id="btn-clear" style="flex:1;padding:14px;border:1px solid #d0d7de;border-radius:8px;background:#f8f9fa">清除</button>
+      <button id="btn-cancel" style="flex:1;padding:14px;border:1px solid #d0d7de;border-radius:8px;background:#f8f9fa">取消</button>
+      <button id="btn-confirm" style="flex:1;padding:14px;border-radius:8px;background:#2c5f2d;color:#fff;border:none;font-weight:700">确认</button>
+    </div>`;
+  document.body.appendChild(popup);
+  popupCanvas = popup.querySelector('#popup-canvas');
+
+  function pos(e, c){
+    const r=c.getBoundingClientRect();
+    const t=e.touches?e.touches[0]:e;
+    return {x:t.clientX-r.left,y:t.clientY-r.top};
+  }
+
+  // Touch events
+  popupCanvas.addEventListener('touchstart', e=>{ e.preventDefault(); isDrawing=true; lastPoint=pos(e,popupCanvas);},{passive:false});
+  popupCanvas.addEventListener('touchmove', e=>{
+    e.preventDefault();
+    if(!isDrawing) return;
+    const p=pos(e,popupCanvas);
+    popupCtx.beginPath();
+    popupCtx.moveTo(lastPoint.x,lastPoint.y);
+    popupCtx.lineTo(p.x,p.y);
+    popupCtx.stroke();
+    lastPoint=p;
+  },{passive:false});
+  popupCanvas.addEventListener('touchend', ()=>{ isDrawing=false; });
+
+  // Mouse events
+  popupCanvas.addEventListener('mousedown', e=>{ isDrawing=true; lastPoint=pos(e,popupCanvas); });
+  popupCanvas.addEventListener('mousemove', e=>{
+    if(!isDrawing) return;
+    const p=pos(e,popupCanvas);
+    popupCtx.beginPath();
+    popupCtx.moveTo(lastPoint.x,lastPoint.y);
+    popupCtx.lineTo(p.x, p.y);
+    popupCtx.stroke();
+    lastPoint = p;
+  });
+  popupCanvas.addEventListener('mouseup', ()=>{ isDrawing=false; });
+  popupCanvas.addEventListener('mouseleave', ()=>{ isDrawing=false; });
+
+  popup.querySelector('#btn-clear').onclick = ()=> popupCtx && popupCtx.clearRect(0,0,popupCanvas.width,popupCanvas.height);
+  popup.querySelector('#btn-cancel').onclick = ()=> popup.style.display='none';
+  popup.querySelector('#btn-confirm').onclick = ()=> {
+    if (currentSignTarget) {
+      signatures[currentSignTarget] = popupCanvas.toDataURL('image/png');
+      const small = document.getElementById(currentSignTarget);
+      const ctx = setupCanvas(small);
+      const img = new Image();
+      img.onload = ()=>{
+        const sw = small.getBoundingClientRect().width;
+        const sh = small.getBoundingClientRect().height;
+        const scale = Math.min(sw/img.width, sh/img.height);
+        const w = img.width*scale, h=img.height*scale;
+        const x=(sw-w)/2, y=(sh-h)/2;
+        ctx.clearRect(0,0,small.width,small.height);
+        ctx.drawImage(img,x,y,w,h);
+      };
+      img.src = signatures[currentSignTarget];
+    }
+    popup.style.display='none';
+  };
+  window.addEventListener('resize', ()=>{ if (popup && popup.style.display!=='none') resizePopupCanvas(); });
+}
+
+function resizePopupCanvas(){
+  const dpr = window.devicePixelRatio || 1;
+  const rect = popupCanvas.getBoundingClientRect();
+  popupCanvas.width = rect.width * dpr;
+  popupCanvas.height = rect.height * dpr;
+  popupCtx = popupCanvas.getContext('2d');
+  popupCtx.scale(dpr, dpr);
+  popupCtx.lineWidth = 3;
+  popupCtx.lineCap = 'round';
+  popupCtx.lineJoin = 'round';
+}
+
+function openSignPad(targetId){
+  ensurePopup();
+  currentSignTarget = targetId;
+  popup.querySelector('#popup-title').textContent = targetId==='sig-customer' ? '客户签名 Customer' : '公司代表签名 Rep';
+  popup.style.display='flex';
+  setTimeout(() => { resizePopupCanvas(); popupCtx.clearRect(0,0,popupCanvas.width,popupCanvas.height); }, 0);
+}
+
+// --- Collect 8 answers from the table (text inputs) ---
+function getFormData(){
+  const rows = Array.from(document.querySelectorAll('section h2 + table tbody tr'));
+  const toVal = (i) => (rows[i] && rows[i].querySelector('input')) ? rows[i].querySelector('input').value.trim() : '';
+  return {
+    pmId: document.getElementById('pm-id').value.trim(),
+    client: document.getElementById('client').value.trim(),
+    address: document.getElementById('address').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    notes: document.getElementById('notes').value.trim(),
+    q1: toVal(0),
+    q2: toVal(1),
+    q3: toVal(2),
+    q4: toVal(3),
+    q5: toVal(4),
+    q6: toVal(5),
+    q7: toVal(6),
+    q8: toVal(7)
+  };
+}
+
+// --- Build PDF DOM with 8 questions (EN on top, CN below) ---
+function buildContractDOM(data){
+  const root = document.getElementById('pdf-contract-root');
+  root.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'contract';
+  wrap.innerHTML = `
+    <h1>WoodHaven Project Acceptance Form</h1>
+    <div class="meta-line">Date: ${dateStr}</div>
+    <div class="block-title">Project Information</div>
+    <table>
+      <tr><th>PM/ID</th><td>${data.pmId || '-'}</td></tr>
+      <tr><th>Client</th><td>${data.client || '-'}</td></tr>
+      <tr><th>Phone</th><td>${data.phone || '-'}</td></tr>
+      <tr><th>Address</th><td>${data.address || '-'}</td></tr>
+    </table>
+    <div class="block-title">Service Checklist</div>
+    <table>
+      <tr><th style="width:76%">Item</th><th>Answer</th></tr>
+      <tr><td>1. How would you rate your overall satisfaction with our service?<br/><small>您对我们本次服务的总体满意度如何？</small></td><td>${data.q1 || '-'}</td></tr>
+      <tr><td>2. How likely are you to recommend our products and services to your family and friends?<br/><small>您有多大可能将我们的产品与服务推荐给您的家人和朋友？</small></td><td>${data.q2 || '-'}</td></tr>
+      <tr><td>3. How would you rate the professionalism of our design and communication?<br/><small>您对我们方案设计与沟通的“专业性”评价如何？</small></td><td>${data.q3 || '-'}</td></tr>
+      <tr><td>4. Did the installer arrive on time?<br/><small>安装师傅是否按时到达？</small></td><td>${data.q4 || '-'}</td></tr>
+      <tr><td>5. During the installation, did our technician take care of your property and keep the work area clean?<br/><small>在安装过程中，师傅是否爱护您的现场物品并保持环境整洁？</small></td><td>${data.q5 || '-'}</td></tr>
+      <tr><td>6. Are you satisfied with the final result of the installation service?<br/><small>您对本次“安装服务”的最终完成效果是否满意？</small></td><td>${data.q6 || '-'}</td></tr>
+      <tr><td>7. Do you feel our products and services are reasonably priced?<br/><small>您认为我们的产品与服务的“价格”合理吗？</small></td><td>${data.q7 || '-'}</td></tr>
+      <tr><td>8. Based on your experience, what is the most important area for us to improve?<br/><small>在本次体验中，您认为最需要改进的地方是什么？</small></td><td>${data.q8 || '-'}</td></tr>
+    </table>
+    <div class="block-title">Notes</div>
+    <div class="note-box">${(data.notes || 'N/A').replace(/\\n/g,'<br/>')}</div>
+    <div class="block-title">Signatures</div>
+    <div class="sign-grid">
+      <div>
+        <div style="margin-bottom:6px;font-weight:700">Customer</div>
+        <div class="sign-box">${signatures['sig-customer'] ? '<img src="'+signatures['sig-customer']+'"/>' : ''}</div>
+      </div>
+      <div>
+        <div style="margin-bottom:6px;font-weight:700">Rep</div>
+        <div class="sign-box">${signatures['sig-rep'] ? '<img src="'+signatures['sig-rep']+'"/>' : ''}</div>
+      </div>
+    </div>
+    <div class="footer"><div>Woodhaven Craftworks</div><div>木渊</div></div>
+  `;
+  root.appendChild(wrap);
+  return wrap;
+}
+
+// --- Download handler with multi-page support ---
+document.getElementById('btn-download').addEventListener('click', async () => {
+  const data = getFormData();
+  const node = buildContractDOM(data);
+  const container = document.getElementById('pdf-contract-root');
+  const prevCSS = container.getAttribute('style') || '';
+  container.style.position = 'fixed';
+  container.style.left = '0px';
+  container.style.top = '0px';
+  container.style.opacity = '0';
+  container.style.pointerEvents = 'none';
+  container.style.zIndex = '-1';
+
+  const canvas = await html2canvas(node, { scale: 2, backgroundColor: '#ffffff' });
+  const imgData = canvas.toDataURL('image/jpeg', 0.95);
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const marginX = 72;   // 1 inch
+  const marginTop = 36; // 0.5 inch
+  const usableWidth = pageWidth - marginX * 2;
+
+  const ratio = usableWidth / canvas.width;
+  const imgWidth = usableWidth;
+  const imgHeight = canvas.height * ratio;
+
+  let heightLeft = imgHeight;
+  let position = marginTop;
+
+  pdf.addImage(imgData, 'JPEG', marginX, position, imgWidth, imgHeight);
+  heightLeft -= (pageHeight - marginTop);
+
+  while (heightLeft > 0) {
+    pdf.addPage();
+    position = marginTop - (imgHeight - heightLeft);
+    pdf.addImage(imgData, 'JPEG', marginX, position, imgWidth, imgHeight);
+    heightLeft -= (pageHeight - marginTop);
+  }
+
+  const filename = `${data.pmId || 'acceptance'}_${dateStr}.pdf`;
+  pdf.save(filename);
+
+  container.setAttribute('style', prevCSS);
+  container.innerHTML = '';
+});
+</script>
+
+
+</body>
+</html>
